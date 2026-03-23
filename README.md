@@ -1,4 +1,4 @@
-# github-access-reporter
+
 # GitHub Access Reporter
 
 ## Problem Statement
@@ -16,11 +16,13 @@ Organizations often need visibility into who has access to which repositories in
 
 ## Technologies Used
 
-- Java 17
-- Spring Boot 3.5.12
-- Spring WebFlux (WebClient for non-blocking API calls)
-- Maven
-- Lombok
+| Technology | Description |
+|------------|-------------|
+| Java 17 | Core programming language |
+| Spring Boot 3.5.12 | Application framework |
+| Spring WebFlux | Non-blocking API calls with WebClient |
+| Maven | Build and dependency management |
+| Lombok | Boilerplate code reduction |
 
 ---
 
@@ -30,108 +32,118 @@ Organizations often need visibility into who has access to which repositories in
 
 - Java 17 or higher installed
 - GitHub account
-- GitHub Personal Access Token (with required scopes)
+- GitHub Personal Access Token with required scopes
 
 ### Step 1: Get GitHub Token
 
 1. Log in to GitHub.com
-2. Go to **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**
+2. Navigate to **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**
 3. Click **Generate new token (classic)**
-4. Give it a name: `Access Reporter`
-5. Select expiration: `30 days` or `90 days`
-6. Select scopes:
-   - ✅ `repo` (full control of private repositories)
-   - ✅ `read:org` (read organization data)
-   - ✅ `read:user` (read user data)
+4. Provide a name: `Access Reporter`
+5. Set expiration: `30 days` or `90 days`
+6. Select the following scopes:
+   - ✅ `repo` – Full control of private repositories
+   - ✅ `read:org` – Read organization data
+   - ✅ `read:user` – Read user profile information
 7. Click **Generate token**
-8. **Copy the token** (starts with `ghp_`). You won't see it again!
+8. **Copy the generated token** (starts with `ghp_`). You will not be able to view it again.
 
 ### Step 2: Clone the Repository
 
 ```bash
 git clone https://github.com/ananyamalik1/github-access-reporter.git
 cd github-access-reporter
+```
 
-Step 3: Set Environment Variable
+### Step 3: Set Environment Variable
 
-Windows PowerShell:
+**Windows PowerShell:**
+```powershell
 $env:GITHUB_TOKEN="ghp_your_token_here"
+```
 
-Windows Command Prompt:
+**Windows Command Prompt:**
+```cmd
 set GITHUB_TOKEN=ghp_your_token_here
+```
 
-Mac/Linux:
+**Mac/Linux:**
+```bash
 export GITHUB_TOKEN="ghp_your_token_here"
+```
 
----
+### Step 4: Run the Application
 
-Step 4: Run the Application
-
-Windows:
+**Windows:**
+```bash
 .\mvnw spring-boot:run
+```
 
-Mac/Linux:
+**Mac/Linux:**
+```bash
 ./mvnw spring-boot:run
+```
 
-Wait for the application to start. You should see:
+Wait for the application to start. You should see output similar to:
 
-  .   __          _            __ _ _
- /\\ / _'_ _ _ _()_ _  _ _ \ \ \ \
-( ( )\_ | '_ | '| | ' \/ _` | \ \ \ \
- \\/  _)| |)| | | | | || (| |  ) ) ) )
-  '  |_| .|| ||| |\_, | / / / /
- =========||==============|_/=////
-
+```
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v3.5.12)
 
 Started ReporterApplication in 3.423 seconds
 ✅ GitHub Access Reporter Started!
+```
 
-
-Figure 2: Terminal showing application successfully started
-
----
-
-Step 5: Test the Application
+### Step 5: Test the Application
 
 Open another terminal and run:
 
-Test Health:
+**Health Check:**
+```bash
 curl http://localhost:8080/health
-Expected: OK
+```
+**Expected:** `OK`
 
-Test Application:
+**Test Application:**
+```bash
 curl http://localhost:8080/test
-Expected: ✅ GitHub Access Reporter is Working!
+```
+**Expected:** `✅ GitHub Access Reporter is Working!`
 
-
-Figure 4: Health check endpoint returning OK
-
-Test GitHub Connection:
+**Test GitHub Connection:**
+```bash
 curl http://localhost:8080/test/octocat
-Expected: JSON list of repositories
+```
+**Expected:** JSON list of repositories
 
-Generate Access Report:
+**Generate Access Report:**
+```bash
 curl http://localhost:8080/api/v1/reports/github/octocat
-Expected: JSON access report with users and repositories
+```
+**Expected:** JSON access report with users and repositories
 
 ---
 
-Authentication Configuration
+## Authentication Configuration
 
-How Authentication Works
+### How Authentication Works
 
 | Component | Description |
 |-----------|-------------|
-| Token Storage | Environment variable GITHUB_TOKEN |
-| Configuration | application.yml reads token via ${GITHUB_TOKEN} |
-| WebClient Setup | GitHubConfig.java adds token to Authorization header |
-| Security | Token never hardcoded in source code |
+| Token Storage | Environment variable `GITHUB_TOKEN` |
+| Configuration | `application.yml` reads token via `${GITHUB_TOKEN}` |
+| WebClient Setup | `GitHubConfig.java` adds token to `Authorization` header |
+| Security | Token is never hardcoded in source code |
 
-Configuration File
+### Configuration File
 
-src/main/resources/application.yml:
-
+**src/main/resources/application.yml:**
+```yaml
 server:
   port: 8080
 
@@ -139,45 +151,58 @@ github:
   token: ${GITHUB_TOKEN}
   api:
     base-url: https://api.github.com
+```
 
-Token Scopes Required
+### Token Scopes Required
 
 | Scope | Purpose |
 |-------|---------|
-| repo | Access to public and private repositories |
-| read:org | Read organization data and members |
-| read:user | Read user profile information |
+| `repo` | Access to public and private repositories |
+| `read:org` | Read organization data and members |
+| `read:user` | Read user profile information |
 
 ---
 
-API Endpoints
+## API Endpoints
 
-Base URL
+### Base URL
+```
 http://localhost:8080
+```
 
-Endpoints Summary
+### Endpoints Summary
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | /health | Health check |
-| GET | /test | Simple test endpoint |
-| GET | /test/{organization} | Test GitHub connection |
-| GET | /api/v1/reports/github/{organization} | Main endpoint - Access report |
+| GET | `/health` | Health check |
+| GET | `/test` | Simple test endpoint |
+| GET | `/test/{organization}` | Test GitHub connection |
+| GET | `/api/v1/reports/github/{organization}` | Main endpoint – Access report |
 
-Detailed API Documentation
+### Detailed API Documentation
 
-1. Health Check
+#### 1. Health Check
+```
 GET /health
-Response: OK
+```
+**Response:** `OK`
 
-2. Test Application
+#### 2. Test Application
+```
 GET /test
-Response: ✅ GitHub Access Reporter is Working!
+```
+**Response:** `✅ GitHub Access Reporter is Working!`
 
-3. Test GitHub Connection
+#### 3. Test GitHub Connection
+```
 GET /test/{organization}
-Example: curl http://localhost:8080/test/octocat
-Response:
+```
+**Example:**
+```bash
+curl http://localhost:8080/test/octocat
+```
+**Response:**
+```json
 [
   {
     "id": 1296269,
@@ -187,15 +212,22 @@ Response:
     "privateRepo": false
   }
 ]
+```
 
-4. Generate Access Report (Main Requirement)
+#### 4. Generate Access Report (Main Requirement)
+```
 GET /api/v1/reports/github/{organization}
-Example: curl http://localhost:8080/api/v1/reports/github/octocat
+```
+**Example:**
+```bash
+curl http://localhost:8080/api/v1/reports/github/octocat
+```
 
 ---
 
-Example Response
+## Example Response
 
+```json
 {
   "organization": "octocat",
   "generatedAt": 1701234567890,
@@ -239,76 +271,77 @@ Example Response
     }
   ]
 }
+```
 
-Response Fields Explanation
+### Response Fields Explanation
 
 | Field | Description |
 |-------|-------------|
-| organization | GitHub organization name |
-| generatedAt | Timestamp when report was generated |
-| totalRepositories | Total number of repositories in organization |
-| totalUsers | Total number of unique users with access |
-| users | List of users with their repository access |
-| username | GitHub username |
-| repositories | List of repositories user can access |
-| repository | Repository name |
-| access | Access level (admin/write/read) |
-| fullName | Full repository name (org/repo) |
+| `organization` | GitHub organization name |
+| `generatedAt` | Timestamp when report was generated |
+| `totalRepositories` | Total number of repositories in organization |
+| `totalUsers` | Total number of unique users with access |
+| `users` | List of users with their repository access |
+| `username` | GitHub username |
+| `repositories` | List of repositories the user can access |
+| `repository` | Repository name |
+| `access` | Access level (admin / write / read) |
+| `fullName` | Full repository name (org/repo) |
 
 ---
 
-Assumptions
+## Assumptions
 
-1. GitHub Token: User provides a valid GitHub Personal Access Token with required scopes (repo, read:org, read:user)
-2. Organization Name: Provided organization name is valid and accessible with the given token
-3. Token Validity: Token is assumed to be active and not expired
-4. Public Repositories: Token can access public repositories, but private repositories require token
-5. Access Levels: Users can have three access levels:
-   - admin - Full administrative access
-   - write - Can push code
-   - read - Can only view
-6. Network Connectivity: Assumes stable internet connection to GitHub API
+| Assumption | Description |
+|------------|-------------|
+| GitHub Token | User provides a valid Personal Access Token with required scopes |
+| Organization Name | Provided organization exists and is accessible with the token |
+| Token Validity | Token is active and not expired |
+| Public Repositories | Token can access public repositories; private repositories require proper scopes |
+| Access Levels | Users can have three access levels: `admin`, `write`, `read` |
+| Network Connectivity | Stable internet connection to GitHub API |
 
 ---
 
-Design Decisions
+## Design Decisions
 
 | Decision | Rationale |
 |----------|-----------|
-| Personal Access Token | Simpler than OAuth for users to set up and use |
-| Spring WebFlux | Non-blocking calls for better performance with multiple repositories |
-| Parallel Processing | Fetch collaborators for multiple repositories simultaneously |
+| Personal Access Token | Simpler than OAuth for setup and usage |
+| Spring WebFlux | Enables non-blocking calls for better performance with multiple repositories |
+| Parallel Processing | Fetches collaborators for multiple repositories simultaneously |
 | ConcurrentHashMap | Thread-safe aggregation during parallel processing |
-| Pagination (per_page=100) | Efficiently fetch large datasets from GitHub API |
-| Sorted Output | Sort users by username for consistent, readable results |
-| Global Exception Handler | Consistent error responses across all endpoints |
+| Pagination (`per_page=100`) | Efficiently fetches large datasets from GitHub API |
+| Sorted Output | Sorts users by username for consistent, readable results |
+| Global Exception Handler | Provides consistent error responses across all endpoints |
 | Separation of Concerns | Clean separation between controller, service, and model layers |
 
 ---
 
-Scale Considerations
+## Scale Considerations
 
-Performance Goals
+### Performance Goals
 
-| Requirement | Target | Implementation |
+| Requirement | Status | Implementation |
 |-------------|--------|----------------|
 | 100+ repositories | ✅ | Parallel API calls (max 10 concurrent) |
 | 1000+ users | ✅ | HashMap aggregation for O(1) lookups |
-| Large datasets | ✅ | Pagination with per_page=100 |
+| Large datasets | ✅ | Pagination with `per_page=100` |
 | Rate limiting | ✅ | Non-blocking I/O with WebClient |
 
-Performance Metrics
+### Performance Metrics
 
 | Organization Size | Repositories | Users | Approximate Time |
 |-------------------|--------------|-------|------------------|
-| Small | less than 10 | less than 100 | less than 2 seconds |
-| Medium | 50 | 500 | 5-10 seconds |
-| Large | 100+ | 1000+ | 15-20 seconds |
+| Small | < 10 | < 100 | < 2 seconds |
+| Medium | 50 | 500 | 5–10 seconds |
+| Large | 100+ | 1000+ | 15–20 seconds |
 
 ---
 
-Project Structure
+## Project Structure
 
+```
 src/main/java/com/cloudeagle/reporter/
 ├── ReporterApplication.java          # Main entry point
 ├── config/
@@ -325,96 +358,107 @@ src/main/java/com/cloudeagle/reporter/
 
 src/main/resources/
 └── application.yml                    # Application configuration
+```
 
 ---
 
-Configuration
+## Configuration
 
-application.yml
-
+### application.yml
+```yaml
 server:
-  port: 8080                    # Application port (change if 8080 is busy)
+  port: 8080                    # Application port
 
 github:
   token: ${GITHUB_TOKEN}        # Read token from environment variable
   api:
     base-url: https://api.github.com
+```
 
-Environment Variables
+### Environment Variables
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| GITHUB_TOKEN | GitHub Personal Access Token | Yes |
+| `GITHUB_TOKEN` | GitHub Personal Access Token | Yes |
 
 ---
 
-Troubleshooting
+## Troubleshooting
 
-Common Issues and Solutions
+### Common Issues and Solutions
 
 | Issue | Possible Cause | Solution |
 |-------|---------------|----------|
-| Port 8080 already in use | Another application using port 8080 | Change port in application.yml to 8081 |
+| Port 8080 already in use | Another application using port 8080 | Change port in `application.yml` to 8081 |
 | 401 Unauthorized | Token is invalid or expired | Generate new token at GitHub.com |
 | 404 Not Found | Organization doesn't exist | Verify organization name |
-| Connection refused | Application not running | Run .\mvnw spring-boot:run |
+| Connection refused | Application not running | Run `./mvnw spring-boot:run` |
 | Rate limit exceeded | Too many API calls | Wait or implement caching |
-| Token not recognized | Token not set in environment | Run $env:GITHUB_TOKEN="token" again |
-| Build failed | Dependencies not downloaded | Run .\mvnw clean install |
-| mvn not recognized | Maven not installed | Use .\mvnw (Maven wrapper included) |
+| Token not recognized | Token not set in environment | Set `GITHUB_TOKEN` again |
+| Build failed | Dependencies not downloaded | Run `./mvnw clean install` |
+| `mvn` not recognized | Maven not installed | Use `./mvnw` (Maven wrapper included) |
 
-Debugging Steps
+### Debugging Steps
 
-1. Check if app is running:
+1. **Check if app is running:**
+   ```bash
    curl http://localhost:8080/health
+   ```
 
-2. Check if token is set:
-   echo $env:GITHUB_TOKEN
+2. **Check if token is set:**
+   ```bash
+   echo $env:GITHUB_TOKEN   # Windows PowerShell
+   echo $GITHUB_TOKEN        # Mac/Linux
+   ```
 
-3. Check GitHub API directly:
-   curl -H "Authorization: Bearer $env:GITHUB_TOKEN" https://api.github.com/user
+3. **Test GitHub API directly:**
+   ```bash
+   curl -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user
+   ```
 
-4. Check application logs:
-   Look for errors in the terminal where the app is running
+4. **Check application logs:** Look for errors in the terminal where the app is running
 
-5. Verify Java version:
+5. **Verify Java version:**
+   ```bash
    java -version
+   ```
    Should show Java 17 or higher
 
 ---
 
-Security Considerations
+## Security Considerations
 
 | Consideration | Implementation |
 |---------------|----------------|
 | Token Protection | Never committed to version control |
-| Environment Variables | Always use environment variables for sensitive data |
+| Environment Variables | Always used for sensitive data |
 | HTTPS | All GitHub API calls use HTTPS |
 | Least Privilege | Token only has minimal required scopes |
 | No Hardcoded Secrets | All secrets read from environment variables |
 
 ---
 
-Conclusion
+## Conclusion
 
 This GitHub Access Reporter successfully meets all the requirements:
-1. ✅ Secure GitHub authentication using Personal Access Token
-2. ✅ Retrieves all repositories from a GitHub organization
-3. ✅ Determines which users have access to each repository
-4. ✅ Generates aggregated view mapping users to repositories
-5. ✅ Exposes REST API endpoint returning JSON report
-6. ✅ Designed to handle 100+ repositories and 1000+ users
+
+| Requirement | Status |
+|-------------|--------|
+| Secure GitHub authentication using Personal Access Token | ✅ |
+| Retrieves all repositories from a GitHub organization | ✅ |
+| Determines which users have access to each repository | ✅ |
+| Generates aggregated view mapping users to repositories | ✅ |
+| Exposes REST API endpoint returning JSON report | ✅ |
+| Handles 100+ repositories and 1000+ users | ✅ |
 
 The service uses Spring Boot with WebFlux for non-blocking API calls, implements parallel processing for efficiency, and provides a clean, well-documented API.
 
 ---
 
----
+## Author
 
-Author
-
-Ananya 
+**Ananya**
 
 ---
 
----
+*For issues or contributions, please open an issue or pull request on GitHub.*
